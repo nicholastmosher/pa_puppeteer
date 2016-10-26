@@ -12,13 +12,7 @@ Returns an array of the system's sinks in the following format:
         "id": "0"
         "name": "alsa_output.pci-000_00.1b.analog-stereo",
         "description": "Built-in Audio Analog Stereo",
-        "state": "RUNNING",
-    },
-    {
-        "id": "3"
-        "name": "null",
-        "description": "Null Output",
-        "state": "SUSPENDED",
+        "state": "RUNNING"
     }
 ]
 '''
@@ -43,13 +37,10 @@ def get_sinks():
     return sinks
 
 
-def get_sinks_short():
-    list_sinks_short_args = ["pactl", "list", "short", "sinks"]
-    process = Popen(list_sinks_short_args, stdout=PIPE, universal_newlines=True)
-    stdout, stderr = process.communicate(input=None, timeout=5)
-    return {"sinks": [{sink.split(TAB)[0]: sink.split(TAB)[1:]} for sink in stdout.split(NL) if sink is not ""]}
-
-
+'''
+Opens a port for third-party pulse audio clients to connect to sinks
+on this local device using the native-protocol-tcp module.
+'''
 def open_sink_server(port):
     open_sink_server_args = [ "pactl"
                             , "load-module"
@@ -62,6 +53,9 @@ def open_sink_server(port):
     return {"status": stdout}
 
 
+'''
+Establishes a "tunnel" sink that streams audio to a remote pulse audio server.
+'''
 def open_sink_tunnel(name, server, sink):
     open_sink_tunnel_args = [ "pactl"
                             , "load-module"
@@ -75,4 +69,82 @@ def open_sink_tunnel(name, server, sink):
     return {"status": stdout}
 
 
-print(get_sinks())
+'''
+Returns an array of loaded modules for this client, represented as
+arrays of each module name and the active parameters loaded for those
+modules.
+'''
+def get_modules():
+    get_modules_args = ["pactl" , "list" , "short" , "modules"]
+    process = Popen(get_modules_args, stdout=PIPE, universal_newlines=True)
+    stdout, stderr = process.communicate(input=None, timeout=5)
+
+    # Modules are split on each line, represented as an array split on tabs.
+    return [out.split("\t") for out in stdout.split("\n")][:-1]
+
+
+'''
+Returns an array of tunnel sinks in the following format:
+
+[
+    {
+        "module":0,
+        "name":"My-tunnel",
+        "server":"10.0.0.1:1111",
+        "sink":0
+    }
+]
+'''
+def get_sink_tunnels():
+    modules = get_modules()
+
+    # Tunnels are modules of type "module-tunnel-sink-new".
+    tunnels = [tunnel[:-1] for tunnel in [mod for mod in modules if mod[1] == "module-tunnel-sink-new"]]
+    tun_dicts = []
+    for tunnel in tunnels:
+        # Arguments delimited by spaces, each is name=value.
+        args = [{"name":arg.split("=")[0],"value":arg.split("=")[1]} for arg in tunnel[2].split(" ")]
+        tun = {
+            "module":tunnel[0],
+            "name":args[0]["value"],
+            "server":args[1]["value"],
+            "sink":args[2]["value"]
+        }
+        tun_dicts.append(tun)
+    return tun_dicts
+
+
+'''
+Returns an array of module information for "module-tunnel-sinks-new" in the
+following format:
+
+[
+    {
+        "module":0,
+        "name":"module-native-protocol-tcp",
+        "port":1111,
+        "auth-anonymous":1
+    }
+]
+'''
+def get_gates():
+    modules = get_modules()
+
+    # Gates are the modules of type "module-native-protocol-tcp"
+    gates = [gate[:-1] for gate in [mod for mod in modules if mod[1] == "module-native-protocol-tcp"]]
+    print(gates)
+    gates_dicts = []
+    for gate in gates:
+        if gate[2] == "":
+            continue
+        # Arguments delimited by spaces, each is name=value.
+        args = [{"name":arg.split("=")[0],"value":arg.split("=")[1]} for arg in gate[2].split(" ")]
+        print(args)
+        gate = {
+            "module":int(gate[0]),
+            "name":gate[1],
+            "port":int(args[0]["value"]),
+            "auth-anonymous":int(args[1]["value"]),
+        }
+        gates_dicts.append(gate)
+    return gates_dicts
