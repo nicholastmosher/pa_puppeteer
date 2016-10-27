@@ -4,8 +4,8 @@ from flask import Flask, jsonify, abort
 from flask_restful import Api, Resource, reqparse, marshal
 from flask_httpauth import HTTPBasicAuth
 
-import puppet.pulse_interface as painter
-import puppet.pulse_models as pamodels
+import pulse_interface as painter
+import pulse_models as pamodels
 
 app = Flask(__name__)
 api = Api(app)
@@ -22,6 +22,25 @@ def get_password(username):
 @auth.error_handler
 def unauthorized():
     return jsonify({'error': 'Unauthorized access'})
+
+
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    return response
+
+
+class InfoAPI(Resource):
+    decorators = [auth.login_required]
+
+    def __init__(self):
+        pass
+
+
+    def get(self):
+        return jsonify({"status":"online"})
 
 
 class SinksAPI(Resource):
@@ -220,6 +239,7 @@ class GateAPI(Resource):
         return jsonify({"status":status})
 
 
+api.add_resource(InfoAPI,     "/v1/info",             endpoint="info")
 api.add_resource(SinksAPI,    "/v1/sinks",            endpoint="sinks")
 api.add_resource(SinkAPI,     "/v1/sinks/<int:id>",   endpoint="sink")
 api.add_resource(ModulesAPI,  "/v1/modules",          endpoint="modules")
