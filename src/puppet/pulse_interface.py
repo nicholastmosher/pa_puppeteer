@@ -8,12 +8,12 @@ NL = "\n"
 Returns an array of the system's sinks in the following format:
 
 [
-    {
-        "id": "0"
-        "name": "alsa_output.pci-000_00.1b.analog-stereo",
-        "description": "Built-in Audio Analog Stereo",
-        "state": "RUNNING"
-    }
+  {
+    "name": "alsa_output.pci-000_00.1b.analog-stereo",
+    "id": "0"
+    "description": "Built-in Audio Analog Stereo",
+    "state": "RUNNING"
+  }
 ]
 '''
 def get_sinks():
@@ -70,48 +70,56 @@ def open_sink_tunnel(name, server, sink):
 
 
 '''
-Returns an array of loaded modules for this client, represented as
-arrays of each module name and the active parameters loaded for those
-modules.
+Returns an array of objects which represent all loaded pulse audio modules.
+
+"modules": [
+  {
+    "name": "",
+    "id": 0,
+    "args": {
+      "arg0": "value0",
+      "arg1": "value1",
+    }
+  }
+]
 '''
 def get_modules():
     get_modules_args = ["pactl" , "list" , "short" , "modules"]
     process = Popen(get_modules_args, stdout=PIPE, universal_newlines=True)
     stdout, stderr = process.communicate(input=None, timeout=5)
 
-    # Modules are split on each line, represented as an array split on tabs.
-    return [out.split("\t") for out in stdout.split("\n")][:-1]
-
+    modules = []
+    lines = stdout.split(NL)[:-1]
+    for line in lines:
+        module = {}
+        chunks = line.split(TAB)[:-1]
+        module['id'] = chunks[0]
+        module['name'] = chunks[1]
+        if chunks[2] != '':
+            arg_string = chunks[2].split(' ')
+            args = {}
+            for arg in arg_string:
+                arg_chunk = arg.split('=')
+                args[arg_chunk[0]] = arg_chunk[1].replace('"', '')
+            module['args'] = args
+        modules.append(module)
+    return modules
 
 '''
 Returns an array of tunnel sinks in the following format:
 
 [
-    {
-        "module":0,
-        "name":"My-tunnel",
-        "server":"10.0.0.1:1111",
-        "sink":0
-    }
+  {
+    "module":"0",
+    "name":"My-tunnel",
+    "server":"10.0.0.1:1111",
+    "sink":"0",
+  },
 ]
 '''
 def get_sink_tunnels():
-    modules = get_modules()
-
     # Tunnels are modules of type "module-tunnel-sink-new".
-    tunnels = [tunnel[:-1] for tunnel in [mod for mod in modules if mod[1] == "module-tunnel-sink-new"]]
-    tun_dicts = []
-    for tunnel in tunnels:
-        # Arguments delimited by spaces, each is name=value.
-        args = [{"name":arg.split("=")[0],"value":arg.split("=")[1]} for arg in tunnel[2].split(" ")]
-        tun = {
-            "module":tunnel[0],
-            "name":args[0]["value"],
-            "server":args[1]["value"],
-            "sink":args[2]["value"]
-        }
-        tun_dicts.append(tun)
-    return tun_dicts
+    return [mod for mod in get_modules() if mod["name"] == "module-tunnel-sink-new"]
 
 
 '''
@@ -119,32 +127,14 @@ Returns an array of module information for "module-tunnel-sinks-new" in the
 following format:
 
 [
-    {
-        "module":0,
-        "name":"module-native-protocol-tcp",
-        "port":1111,
-        "auth-anonymous":1
-    }
+  {
+    "module":0,
+    "name":"module-native-protocol-tcp",
+    "port":"1111",
+    "auth-anonymous":"1",
+  },
 ]
 '''
 def get_gates():
-    modules = get_modules()
-
     # Gates are the modules of type "module-native-protocol-tcp"
-    gates = [gate[:-1] for gate in [mod for mod in modules if mod[1] == "module-native-protocol-tcp"]]
-    print(gates)
-    gates_dicts = []
-    for gate in gates:
-        if gate[2] == "":
-            continue
-        # Arguments delimited by spaces, each is name=value.
-        args = [{"name":arg.split("=")[0],"value":arg.split("=")[1]} for arg in gate[2].split(" ")]
-        print(args)
-        gate = {
-            "module":int(gate[0]),
-            "name":gate[1],
-            "port":int(args[0]["value"]),
-            "auth-anonymous":int(args[1]["value"]),
-        }
-        gates_dicts.append(gate)
-    return gates_dicts
+    return [mod for mod in get_modules() if mod['name'] == "module-native-protocol-tcp"]

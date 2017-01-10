@@ -120,6 +120,22 @@ class ModulesAPI(Resource):
     def __init__(self):
         self.request_parser = reqparse.RequestParser()
 
+    '''
+    GET endpoint for retrieving module information.
+    Returns data in the following format:
+    {
+      "modules": [
+        {
+          "name": "alsa_output.pci-0000_00_1b.0.analog-stereo",
+          "id": 0,
+          "args": {
+            "arg0": "value0",
+            "arg1": "value1",
+          }
+        },
+      ]
+    }
+    '''
     def get(self):
         return jsonify({"modules": painter.get_modules()})
 
@@ -154,14 +170,14 @@ class TunnelAPI(Resource):
     GET endpoint for retrieving information about sinks that are remote tunnels.
     Returns data in the following format:
     {
-        "tunnels": [
-            {
-                "module":0,
-                "name":"My-tunnel",
-                "server":"10.0.0.1:1111",
-                "sink":0
-            }
-        ]
+      "tunnels": [
+        {
+          "module":0,
+          "name":"My-tunnel",
+          "server":"10.0.0.1:1111",
+          "sink":0
+        }
+      ]
     '''
     def get(self):
         return jsonify({"tunnels":painter.get_sink_tunnels()})
@@ -172,14 +188,14 @@ class TunnelAPI(Resource):
 
     Request must be made in the following format:
     {
-        "name":"my-tunneled-sink",
-        "server":"127.0.0.1:1234",
-        "sink":0
+      "name":"my-tunneled-sink",
+      "server":"127.0.0.1:1234",
+      "sink":0
     }
 
     Response will be made in the following format:
     {
-        "status":"status message from pulse audio"
+      "status":"status message from pulse audio"
     }
     '''
     def post(self):
@@ -209,14 +225,14 @@ class GateAPI(Resource):
     Response is given in the following format:
 
     {
-        "gates": [
-            {
-                "module":0,
-                "name":"module-native-protocol-tcp",
-                "port":1111,
-                "auth-anonymous":1
-            }
-        ]
+      "gates": [
+        {
+          "module":0,
+          "name":"module-native-protocol-tcp",
+          "port":1111,
+          "auth-anonymous":1
+        }
+      ]
     }
     '''
     def get(self):
@@ -228,7 +244,7 @@ class GateAPI(Resource):
     Request must be made in the following format:
 
     {
-        "port":1234
+      "port":1234
     }
     '''
     def post(self):
@@ -243,7 +259,7 @@ api.add_resource(InfoAPI,     "/v1/info",             endpoint="info")
 api.add_resource(SinksAPI,    "/v1/sinks",            endpoint="sinks")
 api.add_resource(SinkAPI,     "/v1/sinks/<int:id>",   endpoint="sink")
 api.add_resource(ModulesAPI,  "/v1/modules",          endpoint="modules")
-api.add_resource(ModuleAPI,   "/v1/module/<int:id>",  endpoint="module")
+api.add_resource(ModuleAPI,   "/v1/modules/<int:id>", endpoint="module")
 api.add_resource(TunnelAPI,   "/v1/modules/tunnels",  endpoint="tunnel")
 api.add_resource(GateAPI,     "/v1/modules/gates",    endpoint="gate")
 
