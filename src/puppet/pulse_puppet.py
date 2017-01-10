@@ -66,23 +66,19 @@ class SinksAPI(Resource):
           "name": "alsa_output.pci-0000_00_1b.0.analog-stereo",
           "state": "RUNNING"
         },
-        {
-          "description": "Null Output",
-          "id": 1,
-          "name": "null",
-          "state": "SUSPENDED"
       ]
     }
     '''
     def get(self):
-        return jsonify(
-            {
-                "sinks": [
-                    marshal(sink, pamodels.get_sink_model())
-                    for sink in painter.get_sinks()
-                ]
-            }
-        )
+        result = jsonify({
+            "sinks": [
+                marshal(sink, pamodels.get_sink_model())
+                for sink in painter.get_sinks()
+            ]
+        })
+        print("Returning as query for sinks: ")
+        print(result)
+        return result
 
 
 class SinkAPI(Resource):

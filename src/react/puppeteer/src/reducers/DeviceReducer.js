@@ -4,46 +4,46 @@
  *
  * @author Nick Mosher <nicholastmosher@gmail.com>
  */
-import { Map, OrderedMap, List } from 'immutable';
+import { OrderedMap, List } from 'immutable';
 import { DeviceActions } from '../constants/ActionTypes';
 
 let initialState = OrderedMap({
     devices: List([
-        Map({
-            name: "Device#1",
+        OrderedMap({
+            name: "Device One",
             id: 0,
             description: "Device one!",
-            host: "device1.host",
+            host: "http://127.0.0.1:5000",
             sinks: List([
-                Map({
-                    name: "Sink#1",
+                OrderedMap({
+                    name: "Sink One",
                     id: 0,
                     description: "Sink one!",
                     status: "RUNNING",
                 }),
-                Map({
-                    name: "Sink#2",
+                OrderedMap({
+                    name: "Sink Two",
                     id: 1,
                     description: "Sink two!",
                     status: "SUSPENDED",
                 })
             ]),
             modules: List([
-                Map({
-                    name: "Module#1",
+                OrderedMap({
+                    name: "Module One",
                     id: 0,
-                    args: Map({
+                    args: OrderedMap({
                         arg0: "arg0",
                         arg1: "arg1",
                     })
                 })
             ])
         }),
-        Map({
-            name: "Device#2",
+        OrderedMap({
+            name: "Device Two",
             id: 1,
             description: "Device two!",
-            host: "device2.host",
+            host: "http://localhost:5000",
             sinks: List(),
             modules: List(),
         })
@@ -59,7 +59,7 @@ let initialState = OrderedMap({
  */
 const nextDeviceId = (state) => {
     let ids = [];
-    state.devices.forEach(device => {
+    state.get('devices').forEach(device => {
         ids.push(device.get('id'));
     });
     let i = 0;
@@ -67,7 +67,14 @@ const nextDeviceId = (state) => {
     return i;
 };
 
-const deviceIndex = (state, id) => state.devices.findIndex(d => d.get('id') === id);
+/**
+ * Finds the list index within the state that the device with the given
+ * id is stored at.
+ *
+ * @param state The state tree of the system.
+ * @param id The id of the device to find.
+ */
+const deviceIndex = (state, id) => state.get('devices').findIndex(d => d.get('id') === id);
 
 export default function deviceReducer (state = initialState, action) {
     switch(action.type) {
@@ -76,33 +83,55 @@ export default function deviceReducer (state = initialState, action) {
             if(!action.name || !action.desc || !action.host) {
                 return state;
             }
-            return state.get('devices').push(Map({
-                id: nextDeviceId(state),
+            return state.get('devices').push(OrderedMap({
                 name: action.name,
+                id: nextDeviceId(state),
                 description: action.desc,
                 host: action.host,
                 sinks: List(),
                 modules: List(),
             }));
+
         case DeviceActions.SET_ACTIVE:
             return state.set('activeDevice', action.id);
+
         case DeviceActions.MODIFY_DEVICE:
+            // Devices must always have a name and a host.
             if(!action.name || !action.host) {
                 return state;
             }
             // Find the existing device and overwrite it.
-            return state.devices.update(deviceIndex(state, action.id), (device) =>
+            return state.set('devices', state.get('devices').update(
+                deviceIndex(state, action.id), (device) =>
                 device.set('name', action.name)
                       .set('description', action.desc)
                       .set('host', action.host)
-            );
+            ));
+
         case DeviceActions.UPDATE_DEVICE:
-            return state.devices.update(deviceIndex(state, action.id), (device) =>
-                device.set('sinks', action.sinks)
-                      .set('modules', action.modules)
-            );
+            return state.set('devices', state.get('devices').update(
+                deviceIndex(state, action.id), (device) => {
+                    device.set('sinks', action.sinks.get('sinks'))
+                          .set('modules', action.modules.get('modules'))
+                }));
+
+        case DeviceActions.UPDATE_SINKS:
+            console.log("Entered UPDATE_SINKS");
+            return state.set('devices', state.get('devices').update(
+                deviceIndex(state, action.id), (device) => device.set('sinks', action.sinks)
+            ));
+
+        case DeviceActions.UPDATE_MODULES:
+            return state.set('devices', state.get('devices').update(
+                deviceIndex(state, action.id), (device) => device.set('modules', action.modules)
+            ));
+
         case DeviceActions.DELETE_DEVICE:
-            break;
+            // Find the existing device and delete it.
+            return state.set('devices', state.devices.remove(
+                deviceIndex(state, action.id))
+            );
+
         default:
             return state;
     }

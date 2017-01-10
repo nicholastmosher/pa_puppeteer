@@ -5,7 +5,6 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import DashboardView from '../views/DashboardView';
-// import Actions from '../actions/index';
 import * as Actions from '../actions/DeviceActions';
 
 const Dashboard = ({
@@ -22,9 +21,10 @@ const Dashboard = ({
 
 const mapStateToProps = (state) => {
     const devices = state.DeviceReducer.get('devices');
+    const activeDevice = devices.filter(d => d.get('id') === state.DeviceReducer.get('activeDevice')).first();
     return ({
         devices,
-        activeDevice: devices.filter(d => d.get('id') === state.DeviceReducer.get('activeDevice')).first(),
+        activeDevice,
     });
 };
 
