@@ -9,7 +9,10 @@ import ModulesCardView from './ModulesCardView';
 function DeviceView(props) {
     return (
         <div>
-            <h1 className="page-header">{props.activeDevice.get('name')}</h1>
+            <div className="page-header">
+                <h1>{props.activeDevice.get('name')}</h1>
+                <h4>{props.activeDevice.get('description')}</h4>
+            </div>
             <DeviceCardView {...props}/>
             <SinksCardView {...props}/>
             <ModulesCardView {...props}/>

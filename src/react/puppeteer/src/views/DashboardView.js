@@ -4,11 +4,10 @@
 import React, { Component } from 'react';
 import DeviceListView from './DeviceListView';
 import DeviceView from './DeviceView';
-import AddDeviceModalView from './AddDeviceModalView';
+import ModalView from './add-device-modal/ModalView';
 import $ from 'jquery';
 import { fromJS } from 'immutable';
 import '../stylesheets/DashboardView.css';
-
 
 /**
  * Encapsulates the top navigation bar and the contents of the page.
@@ -16,7 +15,6 @@ import '../stylesheets/DashboardView.css';
  */
 export default class DashboardView extends Component {
     componentDidMount() {
-        console.log("DashboardView componentDidMount()");
         this.props.devices.forEach(device => {
             $.ajax({
                 url: device.get('host') + "/v1/sinks",
@@ -30,8 +28,6 @@ export default class DashboardView extends Component {
                     console.log("Ajax sink error: " + jqXHR.status);
                 }
             }).done((data) => {
-                console.log("Got sink data!");
-                console.log(fromJS(data['sinks']));
                 this.props.actions.updateSinks(device.get('id'), fromJS(data['sinks']));
             });
 
@@ -47,8 +43,6 @@ export default class DashboardView extends Component {
                     console.log("Ajax module error: " + jqXHR.status);
                 }
             }).done((data) => {
-                console.log("Got module data!");
-                console.log(fromJS(data['modules']));
                 this.props.actions.updateModules(device.get('id'), fromJS(data['modules']));
             });
         });
@@ -85,7 +79,8 @@ export default class DashboardView extends Component {
                         </div>
                     </div>
                 </div>
-                <AddDeviceModalView addDeviceModal={addDeviceModal}/>
+                <ModalView addDeviceModal={addDeviceModal}
+                           {...this.props} />
             </div>
         );
     }

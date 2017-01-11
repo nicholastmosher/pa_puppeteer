@@ -10,9 +10,9 @@ import { DeviceActions } from '../constants/ActionTypes';
 let initialState = OrderedMap({
     devices: List([
         OrderedMap({
-            name: "Device One",
+            name: "Thinkpad",
             id: 0,
-            description: "Device one!",
+            description: "My thinkpad laptop",
             host: "http://127.0.0.1:5000",
             sinks: List([
                 OrderedMap({
@@ -40,9 +40,9 @@ let initialState = OrderedMap({
             ])
         }),
         OrderedMap({
-            name: "Device Two",
+            name: "Obsidyn",
             id: 1,
-            description: "Device two!",
+            description: "The shiny original laptop",
             host: "http://localhost:5000",
             sinks: List(),
             modules: List(),
@@ -63,7 +63,7 @@ const nextDeviceId = (state) => {
         ids.push(device.get('id'));
     });
     let i = 0;
-    while(ids.contains(i)) i++;
+    while(ids.includes(i)) i++;
     return i;
 };
 
@@ -80,17 +80,18 @@ export default function deviceReducer (state = initialState, action) {
     switch(action.type) {
         case DeviceActions.ADD_DEVICE:
             // Check that we have the appropriate parameters in the action.
-            if(!action.name || !action.desc || !action.host) {
+            if(!action.name || !action.host) {
                 return state;
             }
-            return state.get('devices').push(OrderedMap({
+
+            return state.set('devices', state.get('devices').push(OrderedMap({
                 name: action.name,
                 id: nextDeviceId(state),
                 description: action.desc,
                 host: action.host,
                 sinks: List(),
                 modules: List(),
-            }));
+            })));
 
         case DeviceActions.SET_ACTIVE:
             return state.set('activeDevice', action.id);
@@ -116,7 +117,6 @@ export default function deviceReducer (state = initialState, action) {
                 }));
 
         case DeviceActions.UPDATE_SINKS:
-            console.log("Entered UPDATE_SINKS");
             return state.set('devices', state.get('devices').update(
                 deviceIndex(state, action.id), (device) => device.set('sinks', action.sinks)
             ));

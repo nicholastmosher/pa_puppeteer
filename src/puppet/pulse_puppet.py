@@ -35,10 +35,6 @@ def after_request(response):
 class InfoAPI(Resource):
     decorators = [auth.login_required]
 
-    def __init__(self):
-        pass
-
-
     def get(self):
         return jsonify({"status":"online"})
 

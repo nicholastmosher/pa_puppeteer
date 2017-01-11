@@ -32,8 +32,6 @@ function ModuleInfoView(props) {
                     <tbody>
                     <tr><td>Name</td><td>{props.module.get('name')}</td></tr>
                     <tr><td>ID</td><td>{props.module.get('id')}</td></tr>
-                    <tr><td>Description</td><td>{props.module.get('description')}</td></tr>
-                    <tr><td>Status</td><td>{props.module.get('status')}</td></tr>
                     </tbody>
                 </table>
             </div>

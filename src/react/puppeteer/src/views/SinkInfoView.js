@@ -34,7 +34,7 @@ function SinkInfoView(props) {
                         <tr><td>Name</td><td>{props.sink.get('name')}</td></tr>
                         <tr><td>ID</td><td>{props.sink.get('id')}</td></tr>
                         <tr><td>Description</td><td>{props.sink.get('description')}</td></tr>
-                        <tr><td>Status</td><td>{props.sink.get('status')}</td></tr>
+                        <tr><td>Status</td><td>{props.sink.get('state')}</td></tr>
                     </tbody>
                 </table>
             </div>
