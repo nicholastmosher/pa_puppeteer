@@ -12,7 +12,8 @@
     "react-dom": "15.4.2",
     "react-redux": "5.0.1",
     "redux": "^3.6.0",
-    "classnames": "2.2.5"
+    "classnames": "2.2.5",
+    "bootstrap": "4.0.0-alpha.6"
   },
   "scripts": {
     "start": "react-scripts start",

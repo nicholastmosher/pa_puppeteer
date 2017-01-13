@@ -10,7 +10,7 @@ import DeviceListElementView from './DeviceListElementView';
  */
 function DeviceListView(props) {
     return (
-        <ul className="nav nav-sidebar">
+        <ul className="nav nav-pills flex-column">
             {props.devices.map(device => {
                 return (
                     <DeviceListElementView key={device.get('id')}
@@ -18,11 +18,11 @@ function DeviceListView(props) {
                                            {...props} />
                 )
             })}
-            <li><a type="button"
+            <li className="nav-item">
+                <a className="nav-link"
                    data-toggle="modal"
-                   data-target={"#" + props.addDeviceModal}>
-                + New Device
-            </a></li>
+                   data-target={"#" + props.addDeviceModal}>+ New Device</a>
+            </li>
         </ul>
     );
 }

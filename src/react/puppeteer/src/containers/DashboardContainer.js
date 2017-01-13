@@ -11,12 +11,10 @@ const Dashboard = ({
     devices,
     activeDevice,
     actions}) => (
-    <div>
-        <DashboardView actions={actions}
-                       devices={devices}
-                       activeDevice={activeDevice}
-        />
-    </div>
+    <DashboardView actions={actions}
+                   devices={devices}
+                   activeDevice={activeDevice}
+    />
 );
 
 const mapStateToProps = (state) => {

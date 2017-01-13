@@ -2,6 +2,7 @@
  * @author Nick Mosher <nicholastmosher@gmail.com>
  */
 import React from 'react';
+import classNames from 'classnames';
 
 /**
  * Displays a single sidebar element with each device's ID and name.
@@ -9,7 +10,16 @@ import React from 'react';
  */
 function DeviceListElementView(props) {
     return (
-        <li className={props.device === props.activeDevice ? "active" : ""}><a onClick={() => props.actions.setActive(props.device.get('id'))}>{props.device.get('name')}</a></li>
+        <li className="nav-item">
+            <a className={classNames(
+                "nav-link",
+                {
+                    active: props.device === props.activeDevice,
+                }
+            )} onClick={() => props.actions.setActive(props.device.get('id'))}>
+                {props.device.get('name')}
+            </a>
+        </li>
     );
 }
 

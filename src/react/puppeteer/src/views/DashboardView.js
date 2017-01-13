@@ -63,20 +63,20 @@ export default class DashboardView extends Component {
         const addDeviceModal = "AddDeviceModal";
         return (
             <div>
-                <nav className="navbar navbar-inverse navbar-fixed-top">
+                <nav className="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
                     <div className="container-fluid">
                         <a className="navbar-brand" href="#">Pulse Audio Puppeteer</a>
                     </div>
                 </nav>
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-sm-3 col-md-2 sidebar">
+                        <nav className="col-sm-3 col-md-2 hidden-xs-down bg-faded sidebar">
                             <DeviceListView addDeviceModal={addDeviceModal}
                                             onSwitchDevice={this.handleSwitchDevice} {...this.props} />
-                        </div>
-                        <div className="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                        </nav>
+                        <main className="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
                             <DeviceView onAddDevice={this.handleAddDevice} {...this.props} />
-                        </div>
+                        </main>
                     </div>
                 </div>
                 <ModalView addDeviceModal={addDeviceModal}

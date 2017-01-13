@@ -3,21 +3,15 @@
  */
 import React from 'react';
 import DeviceCardView from './DeviceCardView';
-import SinksCardView from './SinksCardView';
-import ModulesCardView from './ModulesCardView';
+import SinksSectionView from './SinksSectionView';
+import ModulesSectionView from './ModulesSectionView';
 
-function DeviceView(props) {
+export default function DeviceView(props) {
     return (
         <div>
-            <div className="page-header">
-                <h1>{props.activeDevice.get('name')}</h1>
-                <h4>{props.activeDevice.get('description')}</h4>
-            </div>
-            <DeviceCardView {...props}/>
-            <SinksCardView {...props}/>
-            <ModulesCardView {...props}/>
+            <DeviceCardView {...props} />
+            <SinksSectionView {...props} />
+            <ModulesSectionView {...props} />
         </div>
     );
 }
-
-export default DeviceView;
