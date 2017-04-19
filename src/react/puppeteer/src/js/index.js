@@ -7,12 +7,25 @@ import { ConnectedRouter } from 'react-router-redux';
 import configureStore from './store/configureStore';
 import AppContainer from './containers/AppContainer';
 
-import $ from 'jquery';
 require('bootstrap');
 import '../stylesheets/main.scss';
 
 const history = createHistory();
 const store = configureStore(history);
+
+/**
+ * Route configuration:
+ *
+ * / -> /dashboard
+ * /dashboard -> /dashboard/devices
+ *
+ * /dashboard/devices
+ * /dashboard/devices/:deviceId
+ * /dashboard/devices/:deviceId/sinks
+ * /dashboard/devices/:deviceId/sinks/:sinkId
+ * /dashboard/devices/:deviceId/modules
+ * /dashboard/devices/:deviceId/modules/:moduleId
+ */
 
 render(
   <Provider store={store}>

@@ -5,7 +5,6 @@ import { fromJS, Map } from 'immutable';
 import { Device, Sink, Module } from './Records';
 
 export const devices = fromJS({
-  activeDevice: '0',
   devices: {
     '0': Device({
       id: '0',

@@ -7,7 +7,7 @@
 import { SinkActionTypes } from '../constants/SinkActionTypes';
 import { sinks } from '../data/Presets';
 
-const ModuleReducer = (state = sinks, action) => {
+const SinkReducer = (state = sinks, action) => {
   switch(action.type) {
 
     case SinkActionTypes.UPDATE_SINKS:

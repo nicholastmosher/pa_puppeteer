@@ -10,9 +10,13 @@
 import { combineReducers } from 'redux';
 import { routerReducer as routing } from 'react-router-redux';
 import DeviceReducer from './DeviceReducer';
+import SinkReducer from './SinkReducer';
+import ModuleReducer from './ModuleReducer';
 
 const rootReducer = combineReducers({
   DeviceReducer,
+  SinkReducer,
+  ModuleReducer,
   routing,
 });
 
